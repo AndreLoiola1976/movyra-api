@@ -130,7 +130,6 @@ create index if not exists idx_tenant_services_service
 
 -- =========================
 -- (MVP) PROFESSIONALS (tenant-scoped)
--- (antigo "barbers")
 -- =========================
 create table if not exists app.professionals (
                                                  id uuid primary key default gen_random_uuid(),

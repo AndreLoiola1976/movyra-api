@@ -18,7 +18,7 @@ public class AppointmentEntityMapper {
         entity.setId(domain.getId());
         entity.setTenantId(domain.getTenantId().value());
         entity.setCustomerId(domain.getCustomerId());
-        entity.setBarberId(domain.getBarberId());
+        entity.setProfessionalId(domain.getProfessionalId());
         entity.setServiceId(domain.getServiceId());
         entity.setStartAt(domain.getStartAt());
         entity.setEndAt(domain.getEndAt());
@@ -44,7 +44,7 @@ public class AppointmentEntityMapper {
                 entity.getId(),
                 TenantId.of(entity.getTenantId()),
                 entity.getCustomerId(),
-                entity.getBarberId(),
+                entity.getProfessionalId(),
                 entity.getServiceId(),
                 timeRange,
                 AppointmentStatus.fromString(entity.getStatus()),

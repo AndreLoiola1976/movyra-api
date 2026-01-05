@@ -4,17 +4,17 @@ import java.util.UUID;
 
 public class AppointmentConflictException extends DomainException {
     
-    private final UUID barberId;
+    private final UUID professionalId;
     private final String timeRange;
     
-    public AppointmentConflictException(UUID barberId, String timeRange) {
-        super(String.format("Barber %s already has an appointment during %s", barberId, timeRange));
-        this.barberId = barberId;
+    public AppointmentConflictException(UUID professionalId, String timeRange) {
+        super(String.format("Professional %s already has an appointment during %s", professionalId, timeRange));
+        this.professionalId = professionalId;
         this.timeRange = timeRange;
     }
     
-    public UUID getBarberId() {
-        return barberId;
+    public UUID getProfessionalId() {
+        return professionalId;
     }
     
     public String getTimeRange() {

@@ -3,7 +3,7 @@ package ai.movyra.adapters.in.rest.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-public record BarberResponse(
+public record ProfessionalResponse(
     UUID id,
     UUID tenantId,
     String displayName,

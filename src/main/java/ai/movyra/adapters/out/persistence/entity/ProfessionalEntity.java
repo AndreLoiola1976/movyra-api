@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "barbers", schema = "app")
-public class BarberEntity {
+@Table(name = "professionals", schema = "app")
+public class ProfessionalEntity {
     
     @Id
     private UUID id;

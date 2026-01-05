@@ -11,7 +11,7 @@ public interface CreateAppointmentUseCase {
     record CreateAppointmentCommand(
         TenantId tenantId,
         UUID customerId,
-        UUID barberId,
+        UUID professionalId,
         UUID serviceId,
         Instant startAt,
         Instant endAt,

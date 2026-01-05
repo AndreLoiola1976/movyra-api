@@ -12,7 +12,6 @@ import ai.movyra.domain.model.valueobject.TimeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,7 +32,7 @@ class CreateAppointmentUseCaseTest {
     private AppointmentService appointmentService;
     
     private final TenantId tenantId = TenantId.generate();
-    private final UUID barberId = UUID.randomUUID();
+    private final UUID professionalId = UUID.randomUUID();
     private final UUID customerId = UUID.randomUUID();
     private final UUID serviceId = UUID.randomUUID();
     
@@ -48,7 +47,7 @@ class CreateAppointmentUseCaseTest {
         Instant start = Instant.parse("2024-01-15T10:00:00Z");
         Instant end = Instant.parse("2024-01-15T11:00:00Z");
         
-        when(appointmentRepository.findByBarberAndTimeRange(any(), any(), any(), any()))
+        when(appointmentRepository.findByProfessionalAndTimeRange(any(), any(), any(), any()))
             .thenReturn(List.of());
         
         when(appointmentRepository.save(any()))
@@ -58,7 +57,7 @@ class CreateAppointmentUseCaseTest {
             new CreateAppointmentUseCase.CreateAppointmentCommand(
                 tenantId,
                 customerId,
-                barberId,
+                    professionalId,
                 serviceId,
                 start,
                 end,
@@ -72,7 +71,7 @@ class CreateAppointmentUseCaseTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getTenantId()).isEqualTo(tenantId);
-        assertThat(result.getBarberId()).isEqualTo(barberId);
+        assertThat(result.getProfessionalId()).isEqualTo(professionalId);
         assertThat(result.getStartAt()).isEqualTo(start);
         assertThat(result.getEndAt()).isEqualTo(end);
         assertThat(result.getStatus()).isEqualTo(AppointmentStatus.REQUESTED);
@@ -91,14 +90,14 @@ class CreateAppointmentUseCaseTest {
             "2024-01-15T11:00:00Z"
         );
         
-        when(appointmentRepository.findByBarberAndTimeRange(any(), any(), any(), any()))
+        when(appointmentRepository.findByProfessionalAndTimeRange(any(), any(), any(), any()))
             .thenReturn(List.of(existingAppointment));
         
         CreateAppointmentUseCase.CreateAppointmentCommand command = 
             new CreateAppointmentUseCase.CreateAppointmentCommand(
                 tenantId,
                 customerId,
-                barberId,
+                    professionalId,
                 serviceId,
                 start,
                 end,
@@ -109,7 +108,7 @@ class CreateAppointmentUseCaseTest {
         // When & Then
         assertThatThrownBy(() -> appointmentService.create(command))
             .isInstanceOf(AppointmentConflictException.class)
-            .hasMessageContaining(barberId.toString());
+            .hasMessageContaining(professionalId.toString());
         
         verify(appointmentRepository, never()).save(any());
     }
@@ -125,7 +124,7 @@ class CreateAppointmentUseCaseTest {
             "2024-01-15T11:00:00Z"
         );
         
-        when(appointmentRepository.findByBarberAndTimeRange(any(), any(), any(), any()))
+        when(appointmentRepository.findByProfessionalAndTimeRange(any(), any(), any(), any()))
             .thenReturn(List.of(cancelledAppointment));
         
         when(appointmentRepository.save(any()))
@@ -135,7 +134,7 @@ class CreateAppointmentUseCaseTest {
             new CreateAppointmentUseCase.CreateAppointmentCommand(
                 tenantId,
                 customerId,
-                barberId,
+                professionalId,
                 serviceId,
                 start,
                 end,
@@ -157,7 +156,7 @@ class CreateAppointmentUseCaseTest {
         Instant start = Instant.parse("2024-01-15T10:00:00Z");
         Instant end = Instant.parse("2024-01-15T11:00:00Z");
         
-        when(appointmentRepository.findByBarberAndTimeRange(any(), any(), any(), any()))
+        when(appointmentRepository.findByProfessionalAndTimeRange(any(), any(), any(), any()))
             .thenReturn(List.of());
         
         when(appointmentRepository.save(any()))
@@ -167,7 +166,7 @@ class CreateAppointmentUseCaseTest {
             new CreateAppointmentUseCase.CreateAppointmentCommand(
                 tenantId,
                 customerId,
-                barberId,
+                professionalId,
                 serviceId,
                 start,
                 end,
@@ -179,9 +178,9 @@ class CreateAppointmentUseCaseTest {
         appointmentService.create(command);
         
         // Then
-        verify(appointmentRepository).findByBarberAndTimeRange(
+        verify(appointmentRepository).findByProfessionalAndTimeRange(
             eq(tenantId),
-            eq(barberId),
+            eq(professionalId),
             eq(start),
             eq(end)
         );
@@ -197,7 +196,7 @@ class CreateAppointmentUseCaseTest {
             UUID.randomUUID(),
             tenantId,
             customerId,
-            barberId,
+            professionalId,
             serviceId,
             timeRange,
             AppointmentStatus.CONFIRMED,
@@ -215,7 +214,7 @@ class CreateAppointmentUseCaseTest {
             UUID.randomUUID(),
             tenantId,
             customerId,
-            barberId,
+            professionalId,
             serviceId,
             timeRange,
             AppointmentStatus.CANCELLED,

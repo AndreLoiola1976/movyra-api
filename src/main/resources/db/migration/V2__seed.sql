@@ -1,6 +1,6 @@
--- 02_seed.sql
--- Idempotent seeds for MVP: platform admin, demo tenant, catalog + i18n,
--- suggestions + i18n, and initial tenant activation (optional).
+-- V2__seed.sql
+-- Seeds idempotentes: platform admin, showcase tenant (para landing),
+-- demo tenant, catálogo + i18n, sugestões, ativações e portfólio padrão.
 
 -- PLATFORM ADMIN (placeholder auth_subject for now)
 insert into app.users (id, auth_subject, email, full_name, is_platform_admin)
@@ -9,18 +9,66 @@ values ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'local-admin-sub', 'andre@movyra
                                set is_platform_admin = true,
                                full_name = excluded.full_name;
 
--- DEMO TENANT
+-- =========================
+-- SHOWCASE TENANT (para o site público antes do 1º cliente)
+-- =========================
+insert into app.tenants (id, slug, name, timezone, billing_status, is_active, logo_url, city, state, country)
+values (
+           'cccccccc-cccc-cccc-cccc-cccccccccccc',
+           'movyra-showcase',
+           'Movyra Showcase Barbershop',
+           'America/New_York',
+           'trial',
+           true,
+           'https://upload.wikimedia.org/wikipedia/commons/1/19/Barber_Shop_-_The_Noun_Project.svg',
+           'Danbury',
+           'CT',
+           'US'
+       )
+    on conflict (slug) do nothing;
+
+-- Você como owner do showcase (útil pra testes do painel admin)
+insert into app.user_tenants (tenant_id, user_id, role)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'tenant_owner')
+    on conflict (tenant_id, user_id) do nothing;
+
+-- =========================
+-- DEMO TENANT (ambiente interno)
+-- =========================
 insert into app.tenants (id, slug, name, timezone, billing_status, is_active)
 values ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'demo-barbershop', 'Demo Barbershop', 'America/New_York', 'trial', true)
     on conflict (slug) do nothing;
 
--- MEMBERSHIP: YOU AS OWNER OF DEMO
 insert into app.user_tenants (tenant_id, user_id, role)
 values ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'tenant_owner')
     on conflict (tenant_id, user_id) do nothing;
 
 -- =========================
--- SERVICE CATALOG (12 services)
+-- PROFESSIONALS (showcase)
+-- =========================
+insert into app.professionals (id, tenant_id, display_name, phone, photo_url, is_active)
+values
+    (
+        'dddddddd-dddd-dddd-dddd-dddddddddddd',
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'Mike (Showcase)',
+        '+1-203-555-0101',
+        'https://images.pexels.com/photos/16030378/pexels-photo-16030378.jpeg?cs=srgb&dl=pexels-ali-rezaei-83910116-16030378.jpg&fm=jpg',
+        true
+    ),
+    (
+        'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'John (Showcase)',
+        '+1-203-555-0102',
+        'https://images.pexels.com/photos/2166642/pexels-photo-2166642.jpeg?cs=srgb&dl=pexels-thgusstavo-santana-2166642.jpg&fm=jpg',
+        true
+    )
+    on conflict (id) do nothing;
+
+-- =========================
+-- SERVICE CATALOG (12 services) + i18n
+-- (mesmo conteúdo que você já tinha)
 -- =========================
 
 -- 1) Classic Haircut
@@ -189,11 +237,9 @@ values
                                     sort_order = excluded.sort_order,
                                     score = excluded.score;
 
--- Suggestions i18n (simple, scalable later)
--- For speed: set all 12 with generic headlines, and keep richer reasons for top ones.
 insert into app.service_suggestions_i18n (service_id, lang, headline, reason)
 values
--- Generic for all services (EN)
+-- EN
 ('10000000-0000-0000-0000-000000000001','en','Recommended','Commonly offered by barbershops'),
 ('10000000-0000-0000-0000-000000000002','en','Recommended','Commonly offered by barbershops'),
 ('10000000-0000-0000-0000-000000000003','en','Recommended','Commonly offered by barbershops'),
@@ -206,7 +252,6 @@ values
 ('10000000-0000-0000-0000-000000000010','en','Recommended','Commonly offered by barbershops'),
 ('10000000-0000-0000-0000-000000000011','en','Recommended','Commonly offered by barbershops'),
 ('10000000-0000-0000-0000-000000000012','en','Recommended','Commonly offered by barbershops'),
-
 -- PT
 ('10000000-0000-0000-0000-000000000001','pt','Recomendado','Serviço comum em barbearias'),
 ('10000000-0000-0000-0000-000000000002','pt','Recomendado','Serviço comum em barbearias'),
@@ -220,7 +265,6 @@ values
 ('10000000-0000-0000-0000-000000000010','pt','Recomendado','Serviço comum em barbearias'),
 ('10000000-0000-0000-0000-000000000011','pt','Recomendado','Serviço comum em barbearias'),
 ('10000000-0000-0000-0000-000000000012','pt','Recomendado','Serviço comum em barbearias'),
-
 -- ES
 ('10000000-0000-0000-0000-000000000001','es','Recomendado','Servicio común en barberías'),
 ('10000000-0000-0000-0000-000000000002','es','Recomendado','Servicio común en barberías'),
@@ -239,7 +283,46 @@ values
                                           reason = excluded.reason;
 
 -- =========================
--- OPTIONAL: Activate a couple services for demo tenant (for immediate UI tests)
+-- Showcase Portfolio (landing)
+-- =========================
+insert into app.portfolio_items (tenant_id, title, description, image_url, is_featured, sort_order)
+values
+    (
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'Skin Fade + Razor Line',
+        'Clean fade with razor lineup finish.',
+        'https://images.pexels.com/photos/2166642/pexels-photo-2166642.jpeg?cs=srgb&dl=pexels-thgusstavo-santana-2166642.jpg&fm=jpg',
+        true,
+        10
+    ),
+    (
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'Beard Trim (Straight Razor)',
+        'Precision beard shaping with straight razor.',
+        'https://images.pexels.com/photos/3992876/pexels-photo-3992876.jpeg?cs=srgb&dl=pexels-thgusstavo-santana-3992876.jpg&fm=jpg',
+        true,
+        20
+    ),
+    (
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'Classic Barbershop Session',
+        'A professional cut in a modern barbershop environment.',
+        'https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg?cs=srgb&dl=pexels-thgusstavo-santana-1813272.jpg&fm=jpg',
+        false,
+        30
+    ),
+    (
+        'cccccccc-cccc-cccc-cccc-cccccccccccc',
+        'Beard Design / Detail Work',
+        'Detail work for beard lines and shape.',
+        'https://images.pexels.com/photos/1018911/pexels-photo-1018911.jpeg?cs=srgb&dl=pexels-thgusstavo-santana-1018911.jpg&fm=jpg',
+        false,
+        40
+    )
+    on conflict do nothing;
+
+-- =========================
+-- OPTIONAL: activate a couple services for demo tenant (for immediate UI tests)
 -- =========================
 insert into app.tenant_services (tenant_id, service_id, price_cents, duration_minutes, is_active)
 values

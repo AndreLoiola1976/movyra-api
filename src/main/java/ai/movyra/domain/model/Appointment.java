@@ -16,7 +16,7 @@ public class Appointment {
     private UUID id;
     private TenantId tenantId;
     private UUID customerId;
-    private UUID barberId;
+    private UUID professionalId;
     private UUID serviceId;
     private TimeRange timeRange;
     private AppointmentStatus status;
@@ -29,7 +29,7 @@ public class Appointment {
             UUID id,
             TenantId tenantId,
             UUID customerId,
-            UUID barberId,
+            UUID professionalId,
             UUID serviceId,
             TimeRange timeRange,
             AppointmentStatus status,
@@ -42,7 +42,7 @@ public class Appointment {
         this.price = Objects.requireNonNull(price, "Price cannot be null");
 
         this.customerId = customerId;
-        this.barberId = barberId;
+        this.professionalId = professionalId;
         this.serviceId = serviceId;
 
         // default, can be overridden when hydrating from persistence
@@ -50,18 +50,18 @@ public class Appointment {
     }
 
     public void checkConflict(List<Appointment> existingAppointments) {
-        if (barberId == null) {
+        if (professionalId == null) {
             return;
         }
 
         for (Appointment existing : existingAppointments) {
-            if (existing.barberId != null &&
-                    existing.barberId.equals(this.barberId) &&
+            if (existing.professionalId != null &&
+                    existing.professionalId.equals(this.professionalId) &&
                     !existing.id.equals(this.id) &&
                     existing.isActiveStatus() &&
                     existing.timeRange.overlaps(this.timeRange)) {
 
-                throw new AppointmentConflictException(barberId, timeRange.toString());
+                throw new AppointmentConflictException(professionalId, timeRange.toString());
             }
         }
     }
@@ -75,7 +75,7 @@ public class Appointment {
     public UUID getId() { return id; }
     public TenantId getTenantId() { return tenantId; }
     public UUID getCustomerId() { return customerId; }
-    public UUID getBarberId() { return barberId; }
+    public UUID getProfessionalId() { return professionalId; }
     public UUID getServiceId() { return serviceId; }
     public TimeRange getTimeRange() { return timeRange; }
     public Instant getStartAt() { return timeRange.startAt(); }

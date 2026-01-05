@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.*;
 class AppointmentResourceIT {
 
     private String tenantId;
-    private String barberId;
+    private String professionalId;
     private String customerId;
     private String serviceId;
 
@@ -26,7 +26,7 @@ class AppointmentResourceIT {
         // Create tenant (NO X-Tenant required)
         Map<String, Object> tenantRequest = new HashMap<>();
         tenantRequest.put("slug", "demo-" + UUID.randomUUID());
-        tenantRequest.put("name", "Demo Barbershop");
+        tenantRequest.put("name", "Demo scheduleShop");
 
         tenantId = given()
                 .contentType(ContentType.JSON)
@@ -38,17 +38,17 @@ class AppointmentResourceIT {
                 .extract()
                 .path("id");
 
-        // Create barber (X-Tenant required)
-        Map<String, Object> barberRequest = new HashMap<>();
-        barberRequest.put("displayName", "John Barber");
-        barberRequest.put("phone", "555-0100");
+        // Create professional (X-Tenant required)
+        Map<String, Object> professionalRequest = new HashMap<>();
+        professionalRequest.put("displayName", "John Professional");
+        professionalRequest.put("phone", "555-0100");
 
-        barberId = given()
+        professionalId = given()
                 .header("X-Tenant", tenantId)
                 .contentType(ContentType.JSON)
-                .body(barberRequest)
+                .body(professionalRequest)
                 .when()
-                .post("/api/barbers")
+                .post("/api/professionals")
                 .then()
                 .statusCode(201)
                 .extract()
@@ -76,15 +76,15 @@ class AppointmentResourceIT {
 
     @Test
     void shouldRejectTenantScopedEndpointWithoutHeader() {
-        Map<String, Object> barberRequest = new HashMap<>();
-        barberRequest.put("displayName", "NoTenant Barber");
-        barberRequest.put("phone", "555-9999");
+        Map<String, Object> professionalRequest = new HashMap<>();
+        professionalRequest.put("displayName", "NoTenant Professional");
+        professionalRequest.put("phone", "555-9999");
 
         given()
                 .contentType(ContentType.JSON)
-                .body(barberRequest)
+                .body(professionalRequest)
                 .when()
-                .post("/api/barbers")
+                .post("/api/professionals")
                 .then()
                 .statusCode(400)
                 .body("error", anyOf(equalTo("Missing X-Tenant header"), containsString("Missing X-Tenant")));
@@ -97,7 +97,7 @@ class AppointmentResourceIT {
 
         Map<String, Object> request = new HashMap<>();
         request.put("customerId", customerId);
-        request.put("barberId", barberId);
+        request.put("professionalId", professionalId);
         request.put("serviceId", serviceId);
         request.put("startAt", startAt.toString());
         request.put("endAt", endAt.toString());
@@ -116,13 +116,13 @@ class AppointmentResourceIT {
     }
 
     @Test
-    void shouldRejectOverlappingAppointmentsForSameBarber() {
+    void shouldRejectOverlappingAppointmentsForSameProfessional() {
         Instant start1 = Instant.parse("2024-01-15T10:00:00Z");
         Instant end1 = Instant.parse("2024-01-15T11:00:00Z");
 
         Map<String, Object> req1 = new HashMap<>();
         req1.put("customerId", customerId);
-        req1.put("barberId", barberId);
+        req1.put("professionalId", professionalId);
         req1.put("serviceId", serviceId);
         req1.put("startAt", start1.toString());
         req1.put("endAt", end1.toString());
@@ -142,7 +142,7 @@ class AppointmentResourceIT {
 
         Map<String, Object> req2 = new HashMap<>();
         req2.put("customerId", customerId);
-        req2.put("barberId", barberId);
+        req2.put("professional", professionalId);
         req2.put("serviceId", serviceId);
         req2.put("startAt", start2.toString());
         req2.put("endAt", end2.toString());

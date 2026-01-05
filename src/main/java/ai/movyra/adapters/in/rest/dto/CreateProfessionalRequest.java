@@ -1,6 +1,6 @@
 package ai.movyra.adapters.in.rest.dto;
 
-public record CreateBarberRequest(
+public record CreateProfessionalRequest(
     String displayName,
     String phone
 ) {}

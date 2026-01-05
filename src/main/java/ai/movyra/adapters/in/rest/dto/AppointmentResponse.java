@@ -7,7 +7,7 @@ public record AppointmentResponse(
     UUID id,
     UUID tenantId,
     UUID customerId,
-    UUID barberId,
+    UUID professionalId,
     UUID serviceId,
     Instant startAt,
     Instant endAt,

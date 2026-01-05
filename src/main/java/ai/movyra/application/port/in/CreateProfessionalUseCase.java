@@ -1,15 +1,15 @@
 package ai.movyra.application.port.in;
 
-import ai.movyra.domain.model.Barber;
+import ai.movyra.domain.model.Professional;
 import ai.movyra.domain.model.valueobject.TenantId;
 
-public interface CreateBarberUseCase {
+public interface CreateProfessionalUseCase {
     
-    record CreateBarberCommand(
+    record CreateProfessionalCommand(
         TenantId tenantId,
         String displayName,
         String phone
     ) {}
     
-    Barber create(CreateBarberCommand command);
+    Professional create(CreateProfessionalCommand command);
 }

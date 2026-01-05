@@ -1,13 +1,13 @@
 package ai.movyra.adapters.out.persistence.mapper;
 
-import ai.movyra.adapters.out.persistence.entity.BarberEntity;
-import ai.movyra.domain.model.Barber;
+import ai.movyra.adapters.out.persistence.entity.ProfessionalEntity;
+import ai.movyra.domain.model.Professional;
 import ai.movyra.domain.model.valueobject.TenantId;
 
-public class BarberEntityMapper {
+public class ProfessionalEntityMapper {
     
-    public BarberEntity toEntity(Barber domain) {
-        BarberEntity entity = new BarberEntity();
+    public ProfessionalEntity toEntity(Professional domain) {
+        ProfessionalEntity entity = new ProfessionalEntity();
         entity.setId(domain.getId());
         entity.setTenantId(domain.getTenantId().value());
         entity.setDisplayName(domain.getDisplayName());
@@ -17,14 +17,14 @@ public class BarberEntityMapper {
         return entity;
     }
     
-    public Barber toDomain(BarberEntity entity) {
-        Barber barber = new Barber(
+    public Professional toDomain(ProfessionalEntity entity) {
+        Professional professional = new Professional(
             entity.getId(),
             TenantId.of(entity.getTenantId()),
             entity.getDisplayName()
         );
-        barber.setPhone(entity.getPhone());
-        barber.setActive(entity.isActive());
-        return barber;
+        professional.setPhone(entity.getPhone());
+        professional.setActive(entity.isActive());
+        return professional;
     }
 }

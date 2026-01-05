@@ -50,11 +50,11 @@ public class AppointmentPanacheRepository
     }
 
     @Override
-    public List<Appointment> findByBarberAndTimeRange(TenantId tenantId, UUID barberId, Instant start, Instant end) {
+    public List<Appointment> findByProfessionalAndTimeRange(TenantId tenantId, UUID professionalId, Instant start, Instant end) {
         return find(
-                "tenantId = ?1 and barberId = ?2 and startAt < ?3 and endAt > ?4",
+                "tenantId = ?1 and professionalId = ?2 and startAt < ?3 and endAt > ?4",
                 tenantId.value(),
-                barberId,
+                professionalId,
                 end,
                 start
         ).stream().map(mapper::toDomain).toList();

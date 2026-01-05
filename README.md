@@ -62,7 +62,7 @@ curl -H "X-Tenant: 123e4567-e89b-12d3-a456-426614174000" \
 ## API Endpoints
 
 - `POST /api/tenants` - Create tenant
-- `POST /api/barbers` - Create barber (requires X-Tenant)
+- `POST /api/barbers` - Create professional (requires X-Tenant)
 - `POST /api/customers` - Create customer (requires X-Tenant)
 - `POST /api/appointments` - Create appointment (requires X-Tenant)
 - `GET /api/appointments?from=&to=` - List appointments (requires X-Tenant)

@@ -15,7 +15,7 @@ public class AppointmentMapper {
         return new CreateAppointmentUseCase.CreateAppointmentCommand(
             tenantId,
             request.customerId(),
-            request.barberId(),
+            request.professionalId(),
             request.serviceId(),
             request.startAt(),
             request.endAt(),
@@ -29,7 +29,7 @@ public class AppointmentMapper {
             appointment.getId(),
             appointment.getTenantId().value(),
             appointment.getCustomerId(),
-            appointment.getBarberId(),
+            appointment.getProfessionalId(),
             appointment.getServiceId(),
             appointment.getStartAt(),
             appointment.getEndAt(),

@@ -48,7 +48,7 @@ public class AppointmentService implements CreateAppointmentUseCase, FindAppoint
                 UUID.randomUUID(),
                 command.tenantId(),
                 command.customerId(),
-                command.barberId(),
+                command.professionalId(),
                 command.serviceId(),
                 range,
                 AppointmentStatus.REQUESTED,
@@ -56,11 +56,11 @@ public class AppointmentService implements CreateAppointmentUseCase, FindAppoint
         );
         appointment.setNotes(command.notes());
 
-        // Conflict check only makes sense if barberId exists
-        if (command.barberId() != null) {
-            List<Appointment> existing = appointmentRepository.findByBarberAndTimeRange(
+        // Conflict check only makes sense if professionalId exists
+        if (command.professionalId() != null) {
+            List<Appointment> existing = appointmentRepository.findByProfessionalAndTimeRange(
                     command.tenantId(),
-                    command.barberId(),
+                    command.professionalId(),
                     command.startAt(),
                     command.endAt()
             );

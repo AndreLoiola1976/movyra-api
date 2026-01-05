@@ -17,8 +17,8 @@ public class AppointmentEntity {
     @Column(name = "customer_id")
     private UUID customerId;
     
-    @Column(name = "barber_id")
-    private UUID barberId;
+    @Column(name = "professional_id")
+    private UUID professionalId;
     
     @Column(name = "service_id")
     private UUID serviceId;
@@ -53,8 +53,8 @@ public class AppointmentEntity {
     public UUID getCustomerId() { return customerId; }
     public void setCustomerId(UUID customerId) { this.customerId = customerId; }
     
-    public UUID getBarberId() { return barberId; }
-    public void setBarberId(UUID barberId) { this.barberId = barberId; }
+    public UUID getProfessionalId() { return professionalId; }
+    public void setProfessionalId(UUID professionalId) { this.professionalId = professionalId; }
     
     public UUID getServiceId() { return serviceId; }
     public void setServiceId(UUID serviceId) { this.serviceId = serviceId; }

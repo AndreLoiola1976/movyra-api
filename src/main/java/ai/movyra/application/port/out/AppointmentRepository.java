@@ -14,7 +14,7 @@ public interface AppointmentRepository {
     
     Optional<Appointment> findById(TenantId tenantId, UUID id);
     
-    List<Appointment> findByBarberAndTimeRange(TenantId tenantId, UUID barberId, Instant start, Instant end);
+    List<Appointment> findByProfessionalAndTimeRange(TenantId tenantId, UUID professionalId, Instant start, Instant end);
     
     List<Appointment> findByTimeRange(TenantId tenantId, Instant start, Instant end);
 }

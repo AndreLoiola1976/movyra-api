@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record CreateAppointmentRequest(
     UUID customerId,
-    UUID barberId,
+    UUID professionalId,
     UUID serviceId,
     Instant startAt,
     Instant endAt,
