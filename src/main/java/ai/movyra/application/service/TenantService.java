@@ -1,0 +1,102 @@
+package ai.movyra.application.service;
+
+import ai.movyra.application.port.in.CreateTenantUseCase;
+import ai.movyra.application.port.out.TenantRepository;
+import ai.movyra.domain.model.Tenant;
+import ai.movyra.domain.exception.TenantSlugAlreadyExistsException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+@ApplicationScoped
+public class TenantService implements CreateTenantUseCase {
+
+    private final TenantRepository tenantRepository;
+
+    public TenantService(TenantRepository tenantRepository) {
+        this.tenantRepository = Objects.requireNonNull(tenantRepository, "tenantRepository must not be null");
+    }
+
+    @Override
+    @Transactional
+    public Tenant create(CreateTenantCommand command) {
+        Objects.requireNonNull(command, "command must not be null");
+        requireNonBlank(command.slug(), "slug must not be blank");
+        requireNonBlank(command.name(), "name must not be blank");
+
+        String slug = normalizeSlug(command.slug());
+        String name = command.name().trim();
+
+        String country = normalizeCountry(command.country());
+        String timezone = normalizeTimezone(command.timezone());
+
+        // SaaS: slug é identidade pública (URL/tenant routing). Duplicidade é conflito.
+        Optional<Tenant> existing = tenantRepository.findBySlug(slug);
+        if (existing.isPresent()) {
+            throw new TenantSlugAlreadyExistsException(slug);
+        }
+
+        Tenant tenant = new Tenant(
+                UUID.randomUUID(),
+                slug,
+                name,
+                country,
+                timezone
+        );
+
+        if (command.phone() != null && !command.phone().isBlank()) {
+            tenant.setPhone(command.phone().trim());
+        }
+
+        return tenantRepository.save(tenant);
+    }
+
+    private static void requireNonBlank(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    /**
+     * Slug stable, url-safe, lowercase.
+     * Rules:
+     * - trim
+     * - lower
+     * - spaces -> hyphen
+     * - keep [a-z0-9-]
+     */
+    private static String normalizeSlug(String raw) {
+        String s = raw.trim().toLowerCase(Locale.ROOT);
+        s = s.replaceAll("\\s+", "-");
+        s = s.replaceAll("[^a-z0-9\\-]", "");
+        if (s.isBlank()) {
+            throw new IllegalArgumentException("slug must contain letters/numbers");
+        }
+        return s;
+    }
+
+    private static String normalizeCountry(String raw) {
+        if (raw == null || raw.isBlank()) return "US";
+        String s = raw.trim().toUpperCase(Locale.ROOT);
+        if (s.length() != 2) {
+            throw new IllegalArgumentException("country must be a 2-letter ISO code (e.g., US, BR)");
+        }
+        return s;
+    }
+
+    private static String normalizeTimezone(String raw) {
+        String tz = (raw == null || raw.isBlank()) ? "America/New_York" : raw.trim();
+        // Guardrail leve: valida se é IANA zone id. Isso evita lixo no banco.
+        try {
+            ZoneId.of(tz);
+            return tz;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("timezone must be a valid IANA zone id (e.g., America/New_York)");
+        }
+    }
+}
