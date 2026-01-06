@@ -73,6 +73,11 @@ public class Tenant {
         this.slug = normalizeSlug(Objects.requireNonNull(newSlug, "slug cannot be null"));
     }
 
+    public void changeTimezone(String newTimezone) {
+        this.timezone = normalizeTimezone(Objects.requireNonNull(newTimezone, "timezone cannot be null"));
+    }
+
+
     public void activate() {
         this.active = true;
     }

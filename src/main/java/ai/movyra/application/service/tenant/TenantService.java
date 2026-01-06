@@ -1,15 +1,15 @@
 package ai.movyra.application.service.tenant;
 
-import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
-import ai.movyra.application.port.in.tenant.GetTenantUseCase;
-import ai.movyra.application.port.in.tenant.ListTenantUseCase;
-import ai.movyra.application.port.in.tenant.DeactivateTenantUseCase;
+import ai.movyra.application.port.in.tenant.*;
 import ai.movyra.application.port.out.TenantRepository;
 import ai.movyra.domain.exception.TenantNotFoundException;
 import ai.movyra.domain.model.Tenant;
 import ai.movyra.domain.exception.TenantSlugAlreadyExistsException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import ai.movyra.application.port.in.tenant.UpdateTenantUseCase;
+import ai.movyra.application.port.in.tenant.UpdateTenantCommand;
+
 
 import java.time.ZoneId;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class TenantService implements CreateTenantUseCase, GetTenantUseCase, ListTenantUseCase, DeactivateTenantUseCase {
+public class TenantService implements CreateTenantUseCase, GetTenantUseCase, ListTenantUseCase, DeactivateTenantUseCase, UpdateTenantUseCase {
 
     private final TenantRepository tenantRepository;
 
@@ -75,6 +75,43 @@ public class TenantService implements CreateTenantUseCase, GetTenantUseCase, Lis
         return tenantRepository.countActive();
     }
 
+    @Override
+    @Transactional
+    public Tenant update(UpdateTenantCommand command) {
+        Objects.requireNonNull(command, "command must not be null");
+        Objects.requireNonNull(command.tenantId(), "tenantId must not be null");
+
+        Tenant tenant = tenantRepository.findById(command.tenantId())
+                .orElseThrow(() -> new TenantNotFoundException(command.tenantId()));
+
+        if (!tenant.isActive()) {
+            throw new TenantNotFoundException(command.tenantId());
+        }
+
+        // name (if present must be non-blank)
+        if (command.name() != null) {
+            String name = command.name().trim();
+            if (name.isBlank()) {
+                throw new IllegalArgumentException("name must not be blank");
+            }
+            // assuming Tenant has setName (if not, compile will tell us and we adjust in 1 step)
+            tenant.rename(name);
+        }
+
+        // phone (null = keep, blank = clear)
+        if (command.phone() != null) {
+            String phone = command.phone().trim();
+            tenant.setPhone(phone.isBlank() ? null : phone);
+        }
+
+        // timezone (if present validate)
+        if (command.timezone() != null) {
+            String tz = normalizeTimezone(command.timezone());
+            tenant.changeTimezone(tz);
+        }
+
+        return tenantRepository.save(tenant);
+    }
 
     @Override
     @Transactional

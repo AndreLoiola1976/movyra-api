@@ -4,6 +4,9 @@ import ai.movyra.adapters.in.rest.dto.CreateTenantRequest;
 import ai.movyra.adapters.in.rest.dto.TenantResponse;
 import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
 import ai.movyra.domain.model.Tenant;
+import ai.movyra.adapters.in.rest.dto.UpdateTenantRequest;
+import ai.movyra.application.port.in.tenant.UpdateTenantCommand;
+import java.util.UUID;
 
 public class TenantMapper {
     
@@ -27,6 +30,15 @@ public class TenantMapper {
             tenant.getTimezone(),
             tenant.isActive(),
             tenant.getCreatedAt()
+        );
+    }
+
+    public static UpdateTenantCommand toUpdateCommand(UUID id, UpdateTenantRequest request) {
+        return new UpdateTenantCommand(
+                id,
+                request.name(),
+                request.phone(),
+                request.timezone()
         );
     }
 }

@@ -2,20 +2,14 @@ package ai.movyra.adapters.in.rest.resource;
 
 import ai.movyra.adapters.in.rest.dto.CreateTenantRequest;
 import ai.movyra.adapters.in.rest.dto.TenantResponse;
+import ai.movyra.adapters.in.rest.dto.UpdateTenantRequest;
 import ai.movyra.adapters.in.rest.mapper.TenantMapper;
-import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
-import ai.movyra.application.port.in.tenant.GetTenantUseCase;
-import ai.movyra.application.port.in.tenant.ListTenantUseCase;
-import ai.movyra.application.port.in.tenant.DeactivateTenantUseCase;
+import ai.movyra.application.port.in.tenant.*;
 
 import ai.movyra.domain.model.Tenant;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
+import jakarta.ws.rs.*;
 
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -23,8 +17,6 @@ import java.util.List;
 import java.util.UUID;
 
 import ai.movyra.adapters.in.rest.dto.PagedResponse;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.QueryParam;
 
 @Path("/api/tenants")
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,7 +33,10 @@ public class TenantResource {
 
     @Inject
     DeactivateTenantUseCase deactivateTenantUseCase;
-    
+
+    @Inject
+    UpdateTenantUseCase updateTenantUseCase;
+
     @POST
     public Response create(CreateTenantRequest request) {
         Tenant tenant = createTenantUseCase.create(TenantMapper.toCommand(request));
@@ -77,6 +72,14 @@ public class TenantResource {
 
         String sortExpr = safeSort + "," + (desc ? "desc" : "asc");
         return new PagedResponse<>(items, page, size, total, sortExpr);
+    }
+
+    @PATCH
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public TenantResponse update(@PathParam("id") UUID id, UpdateTenantRequest request) {
+        Tenant updated = updateTenantUseCase.update(TenantMapper.toUpdateCommand(id, request));
+        return TenantMapper.toResponse(updated);
     }
 
     @POST

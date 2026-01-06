@@ -18,9 +18,19 @@ public class TenantEntityMapper {
         entity.setSlug(domain.getSlug());
         entity.setName(domain.getName());
         entity.setPhone(domain.getPhone());
+        entity.setAddressLine1(domain.getAddressLine1());
+        entity.setAddressLine2(domain.getAddressLine2());
+        entity.setCity(domain.getCity());
+        entity.setState(domain.getState());
+        entity.setZip(domain.getZip());
+
+        entity.setBillingEmail(domain.getBillingEmail());
+        entity.setBillingName(domain.getBillingName());
         entity.setCountry(domain.getCountry());
         entity.setTimezone(domain.getTimezone());
+        entity.setBillingStatus(domain.getBillingStatus());
         entity.setActive(domain.isActive());
+        //entity.setLogoUrl(domain.getLogoUrl());
 
         // Keep createdAt if domain already has it; otherwise rely on @PrePersist in entity.
         Instant createdAt = domain.getCreatedAt();
@@ -44,6 +54,16 @@ public class TenantEntityMapper {
 
         // Optional fields
         tenant.setPhone(entity.getPhone());
+        tenant.setAddressLine1(entity.getAddressLine1());
+        tenant.setAddressLine2(entity.getAddressLine2());
+        tenant.setCity(entity.getCity());
+        tenant.setState(entity.getState());
+        tenant.setZip(entity.getZip());
+
+        tenant.setBillingEmail(entity.getBillingEmail());
+        tenant.setBillingName(entity.getBillingName());
+
+        tenant.setBillingStatus(entity.getBillingStatus());
 
         // These setters must exist in your domain model
         tenant.setActive(entity.isActive());
