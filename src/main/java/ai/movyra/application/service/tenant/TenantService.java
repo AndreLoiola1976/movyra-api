@@ -3,6 +3,7 @@ package ai.movyra.application.service.tenant;
 import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
 import ai.movyra.application.port.in.tenant.GetTenantUseCase;
 import ai.movyra.application.port.in.tenant.ListTenantUseCase;
+import ai.movyra.application.port.in.tenant.DeactivateTenantUseCase;
 import ai.movyra.application.port.out.TenantRepository;
 import ai.movyra.domain.exception.TenantNotFoundException;
 import ai.movyra.domain.model.Tenant;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class TenantService implements CreateTenantUseCase, GetTenantUseCase, ListTenantUseCase {
+public class TenantService implements CreateTenantUseCase, GetTenantUseCase, ListTenantUseCase, DeactivateTenantUseCase {
 
     private final TenantRepository tenantRepository;
 
@@ -37,6 +38,19 @@ public class TenantService implements CreateTenantUseCase, GetTenantUseCase, Lis
     @Transactional
     public List<Tenant> listAllTenants() {
         return tenantRepository.findAllActive();
+    }
+
+    @Override
+    public void deactivate(UUID id) {
+        // idempotent: if not found, throw 404 (we’ll map it), if already inactive, do nothing
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
+
+        if (!tenant.isActive()) {
+            return;
+        }
+
+        tenantRepository.deactivate(id);
     }
 
     @Override

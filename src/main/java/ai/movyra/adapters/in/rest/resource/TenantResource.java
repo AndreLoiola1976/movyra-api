@@ -6,10 +6,13 @@ import ai.movyra.adapters.in.rest.mapper.TenantMapper;
 import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
 import ai.movyra.application.port.in.tenant.GetTenantUseCase;
 import ai.movyra.application.port.in.tenant.ListTenantUseCase;
+import ai.movyra.application.port.in.tenant.DeactivateTenantUseCase;
+
 import ai.movyra.domain.model.Tenant;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -31,6 +34,9 @@ public class TenantResource {
 
     @Inject
     ListTenantUseCase listTenantUseCase;
+
+    @Inject
+    DeactivateTenantUseCase deactivateTenantUseCase;
     
     @POST
     public Response create(CreateTenantRequest request) {
@@ -47,7 +53,17 @@ public class TenantResource {
     }
 
     @GET
-    public List<Tenant> listAll() {
-        return listTenantUseCase.listAllTenants();
+    public List<TenantResponse> listAll() {
+        return listTenantUseCase.listAllTenants()
+                .stream()
+                .map(TenantMapper::toResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @POST
+    @Path("/{id}/deactivate")
+    public Response deactivate(@PathParam("id") UUID id) {
+        deactivateTenantUseCase.deactivate(id);
+        return Response.noContent().build();
     }
 }

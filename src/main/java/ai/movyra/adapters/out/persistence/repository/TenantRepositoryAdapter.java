@@ -76,4 +76,14 @@ public class TenantRepositoryAdapter implements TenantRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    @Transactional
+    public void deactivate(UUID id) {
+        if (id == null) return;
+
+        em.createQuery("update TenantEntity t set t.active = false where t.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
+    }
 }

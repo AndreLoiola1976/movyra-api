@@ -15,4 +15,6 @@ public interface TenantRepository {
     Optional<Tenant> findBySlug(String slug);
 
     List<Tenant> findAllActive();
+
+    void deactivate(UUID id);
 }

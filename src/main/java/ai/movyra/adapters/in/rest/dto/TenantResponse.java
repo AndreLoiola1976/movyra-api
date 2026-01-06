@@ -10,6 +10,6 @@ public record TenantResponse(
     String phone,
     String country,
     String timezone,
-    boolean active,
+    boolean isActive,
     Instant createdAt
 ) {}
