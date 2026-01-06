@@ -22,6 +22,10 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
+import ai.movyra.adapters.in.rest.dto.PagedResponse;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
+
 @Path("/api/tenants")
 @Produces(MediaType.APPLICATION_JSON)
 public class TenantResource {
@@ -53,11 +57,26 @@ public class TenantResource {
     }
 
     @GET
-    public List<TenantResponse> listAll() {
-        return listTenantUseCase.listAllTenants()
+    public PagedResponse<TenantResponse> listAll(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("20") int size,
+            @QueryParam("sort") @DefaultValue("createdAt") String sort,
+            @QueryParam("desc") @DefaultValue("true") boolean desc
+    ) {
+        long total = listTenantUseCase.countActiveTenants();
+
+        List<TenantResponse> items = listTenantUseCase.listActivePage(page, size, sort, desc)
                 .stream()
                 .map(TenantMapper::toResponse)
-                .collect(java.util.stream.Collectors.toList());
+                .toList();
+
+        String safeSort = switch (sort) {
+            case "createdAt", "name", "slug" -> sort;
+            default -> "createdAt";
+        };
+
+        String sortExpr = safeSort + "," + (desc ? "desc" : "asc");
+        return new PagedResponse<>(items, page, size, total, sortExpr);
     }
 
     @POST

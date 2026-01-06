@@ -86,4 +86,37 @@ public class TenantRepositoryAdapter implements TenantRepository {
                 .setParameter("id", id)
                 .executeUpdate();
     }
+
+    @Override
+    public long countActive() {
+        return em.createQuery(
+                        "select count(t) from TenantEntity t where t.active = true",
+                        Long.class
+                )
+                .getSingleResult();
+    }
+
+    @Override
+    public List<Tenant> findActivePage(int offset, int limit, String sortField, boolean sortDesc) {
+        // whitelist de fields (evita JPQL injection via query param)
+        String safeField = switch (sortField) {
+            case "createdAt" -> "createdAt";
+            case "name" -> "name";
+            case "slug" -> "slug";
+            default -> "createdAt";
+        };
+
+        String direction = sortDesc ? "desc" : "asc";
+
+        String jpql = "select t from TenantEntity t where t.active = true order by t." + safeField + " " + direction;
+
+        return em.createQuery(jpql, TenantEntity.class)
+                .setFirstResult(Math.max(0, offset))
+                .setMaxResults(Math.max(1, limit))
+                .getResultList()
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
 }

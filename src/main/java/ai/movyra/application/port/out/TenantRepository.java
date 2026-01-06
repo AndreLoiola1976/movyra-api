@@ -17,4 +17,8 @@ public interface TenantRepository {
     List<Tenant> findAllActive();
 
     void deactivate(UUID id);
+
+    List<Tenant> findActivePage(int offset, int limit, String sortField, boolean sortDesc);
+
+    long countActive();
 }

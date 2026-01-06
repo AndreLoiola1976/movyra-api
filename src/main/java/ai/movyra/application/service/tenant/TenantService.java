@@ -30,8 +30,14 @@ public class TenantService implements CreateTenantUseCase, GetTenantUseCase, Lis
     @Override
     @Transactional
     public Tenant getById(UUID tenantId) {
-        return tenantRepository.findById(tenantId)
+        Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new TenantNotFoundException(tenantId));
+
+        if (!tenant.isActive()) {
+            throw new TenantNotFoundException(tenantId);
+        }
+
+        return tenant;
     }
 
     @Override
@@ -44,7 +50,7 @@ public class TenantService implements CreateTenantUseCase, GetTenantUseCase, Lis
     public void deactivate(UUID id) {
         // idempotent: if not found, throw 404 (we’ll map it), if already inactive, do nothing
         Tenant tenant = tenantRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
+                .orElseThrow(() -> new TenantNotFoundException(id));
 
         if (!tenant.isActive()) {
             return;
@@ -52,6 +58,23 @@ public class TenantService implements CreateTenantUseCase, GetTenantUseCase, Lis
 
         tenantRepository.deactivate(id);
     }
+
+    @Override
+    @Transactional
+    public List<Tenant> listActivePage(int page, int size, String sort, boolean desc) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100); // limite 100
+        int offset = safePage * safeSize;
+
+        return tenantRepository.findActivePage(offset, safeSize, sort, desc);
+    }
+
+    @Override
+    @Transactional
+    public long countActiveTenants() {
+        return tenantRepository.countActive();
+    }
+
 
     @Override
     @Transactional
