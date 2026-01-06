@@ -1,4 +1,4 @@
-package ai.movyra.application.port.in;
+package ai.movyra.application.port.in.appointment;
 
 import ai.movyra.domain.model.Appointment;
 import ai.movyra.domain.model.valueobject.TenantId;

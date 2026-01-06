@@ -1,4 +1,4 @@
-package ai.movyra.application.port.in;
+package ai.movyra.application.port.in.professional;
 
 import ai.movyra.domain.model.Professional;
 import ai.movyra.domain.model.valueobject.TenantId;

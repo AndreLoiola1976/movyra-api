@@ -1,25 +1,42 @@
-package ai.movyra.application.service;
+package ai.movyra.application.service.tenant;
 
-import ai.movyra.application.port.in.CreateTenantUseCase;
+import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
+import ai.movyra.application.port.in.tenant.GetTenantUseCase;
+import ai.movyra.application.port.in.tenant.ListTenantUseCase;
 import ai.movyra.application.port.out.TenantRepository;
+import ai.movyra.domain.exception.TenantNotFoundException;
 import ai.movyra.domain.model.Tenant;
 import ai.movyra.domain.exception.TenantSlugAlreadyExistsException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class TenantService implements CreateTenantUseCase {
+public class TenantService implements CreateTenantUseCase, GetTenantUseCase, ListTenantUseCase {
 
     private final TenantRepository tenantRepository;
 
     public TenantService(TenantRepository tenantRepository) {
         this.tenantRepository = Objects.requireNonNull(tenantRepository, "tenantRepository must not be null");
+    }
+
+    @Override
+    @Transactional
+    public Tenant getById(UUID tenantId) {
+        return tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException(tenantId));
+    }
+
+    @Override
+    @Transactional
+    public List<Tenant> listAllTenants() {
+        return tenantRepository.findAllActive();
     }
 
     @Override

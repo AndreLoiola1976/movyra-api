@@ -5,7 +5,7 @@ import ai.movyra.adapters.in.rest.dto.CreateCustomerRequest;
 import ai.movyra.adapters.in.rest.dto.CustomerResponse;
 import ai.movyra.adapters.in.rest.mapper.CustomerMapper;
 import ai.movyra.adapters.in.rest.tenant.TenantScoped;
-import ai.movyra.application.port.in.CreateCustomerUseCase;
+import ai.movyra.application.port.in.customer.CreateCustomerUseCase;
 import ai.movyra.domain.model.Customer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;

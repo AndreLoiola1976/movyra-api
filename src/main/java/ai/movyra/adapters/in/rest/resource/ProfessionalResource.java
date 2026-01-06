@@ -5,7 +5,7 @@ import ai.movyra.adapters.in.rest.dto.ProfessionalResponse;
 import ai.movyra.adapters.in.rest.dto.CreateProfessionalRequest;
 import ai.movyra.adapters.in.rest.mapper.ProfessionalMapper;
 import ai.movyra.adapters.in.rest.tenant.TenantScoped;
-import ai.movyra.application.port.in.CreateProfessionalUseCase;
+import ai.movyra.application.port.in.professional.CreateProfessionalUseCase;
 import ai.movyra.domain.model.Professional;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;

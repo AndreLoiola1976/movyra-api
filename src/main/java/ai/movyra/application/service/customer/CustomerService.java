@@ -1,6 +1,6 @@
-package ai.movyra.application.service;
+package ai.movyra.application.service.customer;
 
-import ai.movyra.application.port.in.CreateCustomerUseCase;
+import ai.movyra.application.port.in.customer.CreateCustomerUseCase;
 import ai.movyra.application.port.out.CustomerRepository;
 import ai.movyra.domain.model.Customer;
 import jakarta.enterprise.context.ApplicationScoped;

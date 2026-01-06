@@ -1,6 +1,6 @@
-package ai.movyra.application.service;
+package ai.movyra.application.service.professional;
 
-import ai.movyra.application.port.in.CreateProfessionalUseCase;
+import ai.movyra.application.port.in.professional.CreateProfessionalUseCase;
 import ai.movyra.application.port.out.ProfessionalRepository;
 import ai.movyra.domain.model.Professional;
 import jakarta.enterprise.context.ApplicationScoped;

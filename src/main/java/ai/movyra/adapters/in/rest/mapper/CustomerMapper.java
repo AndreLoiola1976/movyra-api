@@ -2,7 +2,7 @@ package ai.movyra.adapters.in.rest.mapper;
 
 import ai.movyra.adapters.in.rest.dto.CreateCustomerRequest;
 import ai.movyra.adapters.in.rest.dto.CustomerResponse;
-import ai.movyra.application.port.in.CreateCustomerUseCase;
+import ai.movyra.application.port.in.customer.CreateCustomerUseCase;
 import ai.movyra.domain.model.Customer;
 import ai.movyra.domain.model.valueobject.TenantId;
 

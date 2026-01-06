@@ -1,6 +1,6 @@
 package ai.movyra.domain.exception;
 
-public class TenantSlugAlreadyExistsException extends RuntimeException {
+public class TenantSlugAlreadyExistsException extends DomainException {
 
     private final String slug;
 

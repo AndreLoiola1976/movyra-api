@@ -2,7 +2,7 @@ package ai.movyra.adapters.in.rest.mapper;
 
 import ai.movyra.adapters.in.rest.dto.AppointmentResponse;
 import ai.movyra.adapters.in.rest.dto.CreateAppointmentRequest;
-import ai.movyra.application.port.in.CreateAppointmentUseCase;
+import ai.movyra.application.port.in.appointment.CreateAppointmentUseCase;
 import ai.movyra.domain.model.Appointment;
 import ai.movyra.domain.model.valueobject.TenantId;
 

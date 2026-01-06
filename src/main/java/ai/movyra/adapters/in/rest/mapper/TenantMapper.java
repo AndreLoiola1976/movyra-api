@@ -2,7 +2,7 @@ package ai.movyra.adapters.in.rest.mapper;
 
 import ai.movyra.adapters.in.rest.dto.CreateTenantRequest;
 import ai.movyra.adapters.in.rest.dto.TenantResponse;
-import ai.movyra.application.port.in.CreateTenantUseCase;
+import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
 import ai.movyra.domain.model.Tenant;
 
 public class TenantMapper {

@@ -1,8 +1,8 @@
 package ai.movyra.application;
 
-import ai.movyra.application.port.in.CreateAppointmentUseCase;
+import ai.movyra.application.port.in.appointment.CreateAppointmentUseCase;
 import ai.movyra.application.port.out.AppointmentRepository;
-import ai.movyra.application.service.AppointmentService;
+import ai.movyra.application.service.appointment.AppointmentService;
 import ai.movyra.domain.exception.AppointmentConflictException;
 import ai.movyra.domain.model.Appointment;
 import ai.movyra.domain.model.valueobject.AppointmentStatus;
