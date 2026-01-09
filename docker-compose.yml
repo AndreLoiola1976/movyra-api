@@ -17,6 +17,7 @@ services:
       retries: 20
 
   api:
+    image: movyra-api:dev
     build:
       context: .
       dockerfile: Dockerfile

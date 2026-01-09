@@ -1,10 +1,10 @@
 package ai.movyra.adapters.in.rest.mapper;
 
-import ai.movyra.adapters.in.rest.dto.CreateTenantRequest;
-import ai.movyra.adapters.in.rest.dto.TenantResponse;
+import ai.movyra.adapters.in.rest.dto.tenant.CreateTenantRequest;
+import ai.movyra.adapters.in.rest.dto.tenant.TenantResponse;
 import ai.movyra.application.port.in.tenant.CreateTenantUseCase;
 import ai.movyra.domain.model.Tenant;
-import ai.movyra.adapters.in.rest.dto.UpdateTenantRequest;
+import ai.movyra.adapters.in.rest.dto.tenant.UpdateTenantRequest;
 import ai.movyra.application.port.in.tenant.UpdateTenantCommand;
 import java.util.UUID;
 

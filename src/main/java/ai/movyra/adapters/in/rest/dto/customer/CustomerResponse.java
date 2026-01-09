@@ -1,4 +1,4 @@
-package ai.movyra.adapters.in.rest.dto;
+package ai.movyra.adapters.in.rest.dto.customer;
 
 import java.time.Instant;
 import java.util.UUID;

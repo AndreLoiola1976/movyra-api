@@ -1,4 +1,4 @@
-package ai.movyra.adapters.in.rest.dto;
+package ai.movyra.adapters.in.rest.dto.tenant;
 
 public record CreateTenantRequest(
     String slug,

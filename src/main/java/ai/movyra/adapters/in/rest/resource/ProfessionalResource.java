@@ -1,8 +1,8 @@
 package ai.movyra.adapters.in.rest.resource;
 
 import ai.movyra.adapters.in.rest.context.TenantContext;
-import ai.movyra.adapters.in.rest.dto.ProfessionalResponse;
-import ai.movyra.adapters.in.rest.dto.CreateProfessionalRequest;
+import ai.movyra.adapters.in.rest.dto.professional.ProfessionalResponse;
+import ai.movyra.adapters.in.rest.dto.professional.CreateProfessionalRequest;
 import ai.movyra.adapters.in.rest.mapper.ProfessionalMapper;
 import ai.movyra.adapters.in.rest.tenant.TenantScoped;
 import ai.movyra.application.port.in.professional.CreateProfessionalUseCase;

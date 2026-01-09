@@ -1,308 +1,551 @@
----
 openapi: 3.1.0
-paths:
-  /api/appointments:
-    get:
-      parameters:
-      - name: from
-        in: query
-        schema:
-          type: string
-      - name: to
-        in: query
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-      summary: Find
-      tags:
-      - Appointment Resource
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateAppointmentRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-        "400":
-          description: Bad Request
-      summary: Create
-      tags:
-      - Appointment Resource
-  /api/customers:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateCustomerRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-        "400":
-          description: Bad Request
-      summary: Create
-      tags:
-      - Customer Resource
-  /api/health:
-    get:
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-      summary: Health
-      tags:
-      - Health Resource
-  /api/professionals:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateProfessionalRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-        "400":
-          description: Bad Request
-      summary: Create
-      tags:
-      - Professional Resource
-  /api/tenants:
-    get:
-      parameters:
-      - name: desc
-        in: query
-        schema:
-          type: boolean
-          default: true
-      - name: page
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 0
-      - name: size
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 20
-      - name: sort
-        in: query
-        schema:
-          type: string
-          default: createdAt
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PagedResponseTenantResponse"
-      summary: List All
-      tags:
-      - Tenant Resource
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTenantRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-        "400":
-          description: Bad Request
-      summary: Create
-      tags:
-      - Tenant Resource
-  /api/tenants/{id}:
-    patch:
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/UUID"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTenantRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TenantResponse"
-      summary: Update
-      tags:
-      - Tenant Resource
-    get:
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/UUID"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TenantResponse"
-      summary: Get By Id
-      tags:
-      - Tenant Resource
-  /api/tenants/{id}/deactivate:
-    post:
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/UUID"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-      summary: Deactivate
-      tags:
-      - Tenant Resource
-components:
-  schemas:
-    CreateAppointmentRequest:
-      type: object
-      properties:
-        customerId:
-          $ref: "#/components/schemas/UUID"
-        professionalId:
-          $ref: "#/components/schemas/UUID"
-        serviceId:
-          $ref: "#/components/schemas/UUID"
-        startAt:
-          $ref: "#/components/schemas/Instant"
-        endAt:
-          $ref: "#/components/schemas/Instant"
-        priceCents:
-          type: integer
-          format: int32
-        notes:
-          type: string
-    CreateCustomerRequest:
-      type: object
-      properties:
-        fullName:
-          type: string
-        phone:
-          type: string
-        email:
-          type: string
-    CreateProfessionalRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-        phone:
-          type: string
-    CreateTenantRequest:
-      type: object
-      properties:
-        slug:
-          type: string
-        name:
-          type: string
-        phone:
-          type: string
-        country:
-          type: string
-        timezone:
-          type: string
-    Instant:
-      type: string
-      format: date-time
-      examples:
-      - 2022-03-10T16:15:50Z
-    PagedResponseTenantResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/TenantResponse"
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        total:
-          type: integer
-          format: int64
-        sort:
-          type: string
-    TenantResponse:
-      type: object
-      properties:
-        id:
-          $ref: "#/components/schemas/UUID"
-        slug:
-          type: string
-        name:
-          type: string
-        phone:
-          type: string
-        country:
-          type: string
-        timezone:
-          type: string
-        isActive:
-          type: boolean
-        createdAt:
-          $ref: "#/components/schemas/Instant"
-    UUID:
-      type: string
-      format: uuid
-      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-    UpdateTenantRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        phone:
-          type: string
-        timezone:
-          type: string
 info:
-  title: movyra-api API
-  version: 1.0.0-SNAPSHOT
+title: movyra-api API
+version: 1.0.0-SNAPSHOT
+
+paths:
+/api/health:
+get:
+summary: Health
+tags: [Health Resource]
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+type: object
+properties:
+status:
+type: string
+example: UP
+
+# =========================
+# TENANTS (master admin)
+# =========================
+/api/tenants:
+get:
+summary: List All
+tags: [Tenant Resource]
+parameters:
+- name: desc
+in: query
+schema: { type: boolean, default: true }
+- name: page
+in: query
+schema: { type: integer, format: int32, default: 0 }
+- name: size
+in: query
+schema: { type: integer, format: int32, default: 20 }
+- name: sort
+in: query
+schema: { type: string, default: createdAt }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/PagedResponseTenantResponse"
+
+post:
+summary: Create
+tags: [Tenant Resource]
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/CreateTenantRequest"
+responses:
+"201":
+description: Created
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/TenantResponse"
+"400":
+description: Bad Request
+
+/api/tenants/{id}:
+get:
+summary: Get By Id
+tags: [Tenant Resource]
+parameters:
+- name: id
+in: path
+required: true
+schema: { $ref: "#/components/schemas/UUID" }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/TenantResponse"
+"404":
+description: Not Found
+
+patch:
+summary: Update
+tags: [Tenant Resource]
+parameters:
+- name: id
+in: path
+required: true
+schema: { $ref: "#/components/schemas/UUID" }
+requestBody:
+required: true
+content:
+application/json:
+schema: { $ref: "#/components/schemas/UpdateTenantRequest" }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema: { $ref: "#/components/schemas/TenantResponse" }
+"400":
+description: Bad Request
+"404":
+description: Not Found
+
+/api/tenants/{id}/deactivate:
+post:
+summary: Deactivate
+tags: [Tenant Resource]
+parameters:
+- name: id
+in: path
+required: true
+schema: { $ref: "#/components/schemas/UUID" }
+responses:
+"204":
+description: No Content
+"404":
+description: Not Found
+
+# =========================
+# TENANT PUBLIC PROFILE (site)
+# Tenant-scoped (X-Tenant)
+# =========================
+/api/tenant-public-profile:
+get:
+summary: Get public profile for current tenant (site-first)
+tags: [Tenant Public Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+- name: lang
+in: query
+description: Optional UI language (fallback uses tenant.defaultLang, then en)
+schema:
+$ref: "#/components/schemas/Lang"
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema: { $ref: "#/components/schemas/TenantPublicProfileResponse" }
+"400":
+description: Bad Request
+
+# =========================
+# PROFESSIONALS (tenant-scoped)
+# =========================
+/api/professionals:
+get:
+summary: List professionals for current tenant
+tags: [Professional Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+- name: activeOnly
+in: query
+schema: { type: boolean, default: true }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+type: array
+items: { $ref: "#/components/schemas/ProfessionalResponse" }
+
+post:
+summary: Create
+tags: [Professional Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+requestBody:
+required: true
+content:
+application/json:
+schema: { $ref: "#/components/schemas/CreateProfessionalRequest" }
+responses:
+"201":
+description: Created
+content:
+application/json:
+schema: { $ref: "#/components/schemas/ProfessionalResponse" }
+"400":
+description: Bad Request
+
+# =========================
+# PORTFOLIO ITEMS (tenant-scoped)
+# =========================
+/api/portfolio-items:
+get:
+summary: List portfolio items for current tenant
+tags: [Portfolio Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+- name: activeOnly
+in: query
+schema: { type: boolean, default: true }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+type: array
+items: { $ref: "#/components/schemas/PortfolioItemResponse" }
+
+post:
+summary: Create portfolio item
+tags: [Portfolio Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+requestBody:
+required: true
+content:
+application/json:
+schema: { $ref: "#/components/schemas/CreatePortfolioItemRequest" }
+responses:
+"201":
+description: Created
+content:
+application/json:
+schema: { $ref: "#/components/schemas/PortfolioItemResponse" }
+"400":
+description: Bad Request
+
+# =========================
+# CUSTOMERS (tenant-scoped)
+# =========================
+/api/customers:
+post:
+summary: Create
+tags: [Customer Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+requestBody:
+required: true
+content:
+application/json:
+schema: { $ref: "#/components/schemas/CreateCustomerRequest" }
+responses:
+"201":
+description: Created
+"400":
+description: Bad Request
+
+# =========================
+# APPOINTMENTS (tenant-scoped)
+# =========================
+/api/appointments:
+get:
+summary: Find
+tags: [Appointment Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+- name: from
+in: query
+schema: { type: string, format: date-time }
+- name: to
+in: query
+schema: { type: string, format: date-time }
+responses:
+"200":
+description: OK
+content:
+application/json:
+schema:
+type: array
+items:
+$ref: "#/components/schemas/AppointmentResponse"
+
+post:
+summary: Create
+tags: [Appointment Resource]
+parameters:
+- $ref: "#/components/parameters/XTenantHeader"
+requestBody:
+required: true
+content:
+application/json:
+schema: { $ref: "#/components/schemas/CreateAppointmentRequest" }
+responses:
+"201":
+description: Created
+content:
+application/json:
+schema: { $ref: "#/components/schemas/AppointmentResponse" }
+"400":
+description: Bad Request
+
+components:
+parameters:
+XTenantHeader:
+name: X-Tenant
+in: header
+required: true
+description: Tenant identifier (UUID) used for tenant-scoped endpoints
+schema:
+$ref: "#/components/schemas/UUID"
+
+schemas:
+# ===== common =====
+UUID:
+type: string
+format: uuid
+pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+
+Instant:
+type: string
+format: date-time
+examples: ["2022-03-10T16:15:50Z"]
+
+Lang:
+type: string
+enum: [en, pt, es]
+default: en
+
+# ===== paging =====
+PagedResponseTenantResponse:
+type: object
+properties:
+items:
+type: array
+items: { $ref: "#/components/schemas/TenantResponse" }
+page: { type: integer, format: int32 }
+size: { type: integer, format: int32 }
+total: { type: integer, format: int64 }
+sort: { type: string }
+
+# ===== tenants =====
+TenantFeatures:
+type: object
+properties:
+chatbotEnabled: { type: boolean, default: false }
+multiProfessionalEnabled: { type: boolean, default: false }
+selfBookingEnabled: { type: boolean, default: false }
+clientPortalEnabled: { type: boolean, default: false }
+
+CreateTenantRequest:
+type: object
+properties:
+slug: { type: string }
+name: { type: string }
+defaultLang: { $ref: "#/components/schemas/Lang" }
+phone: { type: string }
+addressLine1: { type: string }
+addressLine2: { type: string }
+city: { type: string }
+state: { type: string }
+zip: { type: string }
+country: { type: string }
+timezone: { type: string }
+logoUrl: { type: string, nullable: true }
+whatsappPhoneE164:
+type: string
+description: "E.164 format: +12025550123"
+nullable: true
+whatsappMessageTemplate: { type: string, nullable: true }
+instagramUrl: { type: string, nullable: true }
+googleMapsUrl: { type: string, nullable: true }
+websiteUrl: { type: string, nullable: true }
+features:
+$ref: "#/components/schemas/TenantFeatures"
+
+UpdateTenantRequest:
+type: object
+properties:
+name: { type: string }
+defaultLang: { $ref: "#/components/schemas/Lang" }
+phone: { type: string }
+addressLine1: { type: string }
+addressLine2: { type: string }
+city: { type: string }
+state: { type: string }
+zip: { type: string }
+country: { type: string }
+timezone: { type: string }
+logoUrl: { type: string, nullable: true }
+whatsappPhoneE164:
+type: string
+description: "E.164 format: +12025550123"
+nullable: true
+whatsappMessageTemplate: { type: string, nullable: true }
+instagramUrl: { type: string, nullable: true }
+googleMapsUrl: { type: string, nullable: true }
+websiteUrl: { type: string, nullable: true }
+features:
+$ref: "#/components/schemas/TenantFeatures"
+
+TenantResponse:
+type: object
+properties:
+id: { $ref: "#/components/schemas/UUID" }
+slug: { type: string }
+name: { type: string }
+defaultLang: { $ref: "#/components/schemas/Lang" }
+phone: { type: string }
+addressLine1: { type: string }
+addressLine2: { type: string }
+city: { type: string }
+state: { type: string }
+zip: { type: string }
+country: { type: string }
+timezone: { type: string }
+logoUrl: { type: string, nullable: true }
+whatsappPhoneE164: { type: string, nullable: true }
+whatsappMessageTemplate: { type: string, nullable: true }
+instagramUrl: { type: string, nullable: true }
+googleMapsUrl: { type: string, nullable: true }
+websiteUrl: { type: string, nullable: true }
+features:
+$ref: "#/components/schemas/TenantFeatures"
+billingStatus:
+type: string
+enum: [trial, active, past_due, cancelled]
+isActive: { type: boolean }
+createdAt: { $ref: "#/components/schemas/Instant" }
+updatedAt: { $ref: "#/components/schemas/Instant", nullable: true }
+
+# ===== tenant public profile (site) =====
+TenantPublicProfileResponse:
+type: object
+properties:
+tenant:
+$ref: "#/components/schemas/TenantPublicProfileTenant"
+professionals:
+type: array
+items: { $ref: "#/components/schemas/ProfessionalResponse" }
+portfolioItems:
+type: array
+items: { $ref: "#/components/schemas/PortfolioItemResponse" }
+
+TenantPublicProfileTenant:
+type: object
+properties:
+id: { $ref: "#/components/schemas/UUID" }
+slug: { type: string }
+name: { type: string }
+defaultLang: { $ref: "#/components/schemas/Lang" }
+phone: { type: string }
+addressLine1: { type: string }
+addressLine2: { type: string }
+city: { type: string }
+state: { type: string }
+zip: { type: string }
+country: { type: string }
+timezone: { type: string }
+logoUrl: { type: string, nullable: true }
+whatsappPhoneE164: { type: string, nullable: true }
+whatsappMessageTemplate: { type: string, nullable: true }
+instagramUrl: { type: string, nullable: true }
+googleMapsUrl: { type: string, nullable: true }
+websiteUrl: { type: string, nullable: true }
+features:
+$ref: "#/components/schemas/TenantFeatures"
+
+# ===== professionals =====
+CreateProfessionalRequest:
+type: object
+properties:
+displayName: { type: string }
+phone: { type: string, nullable: true }
+photoUrl: { type: string, nullable: true }
+isPrimary: { type: boolean, default: false }
+sortOrder: { type: integer, format: int32, default: 0 }
+publicSlug: { type: string, nullable: true }
+
+ProfessionalResponse:
+type: object
+properties:
+id: { $ref: "#/components/schemas/UUID" }
+tenantId: { $ref: "#/components/schemas/UUID" }
+displayName: { type: string }
+phone: { type: string, nullable: true }
+photoUrl: { type: string, nullable: true }
+isPrimary: { type: boolean }
+sortOrder: { type: integer, format: int32 }
+publicSlug: { type: string, nullable: true }
+isActive: { type: boolean }
+createdAt: { $ref: "#/components/schemas/Instant" }
+updatedAt: { $ref: "#/components/schemas/Instant", nullable: true }
+
+# ===== portfolio =====
+CreatePortfolioItemRequest:
+type: object
+properties:
+title: { type: string }
+description: { type: string, nullable: true }
+imageUrl: { type: string, nullable: true }
+sortOrder: { type: integer, format: int32, default: 0 }
+isActive: { type: boolean, default: true }
+
+PortfolioItemResponse:
+type: object
+properties:
+id: { $ref: "#/components/schemas/UUID" }
+tenantId: { $ref: "#/components/schemas/UUID" }
+title: { type: string }
+description: { type: string, nullable: true }
+imageUrl: { type: string, nullable: true }
+sortOrder: { type: integer, format: int32 }
+isActive: { type: boolean }
+createdAt: { $ref: "#/components/schemas/Instant" }
+updatedAt: { $ref: "#/components/schemas/Instant", nullable: true }
+
+# ===== customers =====
+CreateCustomerRequest:
+type: object
+properties:
+fullName: { type: string }
+phone: { type: string, nullable: true }
+email: { type: string, nullable: true }
+city: { type: string, nullable: true }
+
+# ===== appointments =====
+CreateAppointmentRequest:
+type: object
+properties:
+customerId: { $ref: "#/components/schemas/UUID", nullable: true }
+professionalId: { $ref: "#/components/schemas/UUID", nullable: true }
+tenantServiceId: { $ref: "#/components/schemas/UUID" }
+startAt: { $ref: "#/components/schemas/Instant" }
+endAt: { $ref: "#/components/schemas/Instant" }
+status:
+type: string
+enum: [requested, confirmed, cancelled, completed, no_show]
+priceCents: { type: integer, format: int32, nullable: true }
+notes: { type: string, nullable: true }
+
+AppointmentResponse:
+type: object
+properties:
+id: { $ref: "#/components/schemas/UUID" }
+tenantId: { $ref: "#/components/schemas/UUID" }
+customerId: { $ref: "#/components/schemas/UUID", nullable: true }
+professionalId: { $ref: "#/components/schemas/UUID", nullable: true }
+tenantServiceId: { $ref: "#/components/schemas/UUID" }
+startAt: { $ref: "#/components/schemas/Instant" }
+endAt: { $ref: "#/components/schemas/Instant" }
+status:
+type: string
+enum: [requested, confirmed, cancelled, completed, no_show]
+priceCents: { type: integer, format: int32, nullable: true }
+notes: { type: string, nullable: true }
+createdAt: { $ref: "#/components/schemas/Instant" }
+updatedAt: { $ref: "#/components/schemas/Instant", nullable: true }

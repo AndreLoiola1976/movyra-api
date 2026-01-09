@@ -1,8 +1,8 @@
 package ai.movyra.adapters.in.rest.resource;
 
 import ai.movyra.adapters.in.rest.context.TenantContext;
-import ai.movyra.adapters.in.rest.dto.CreateCustomerRequest;
-import ai.movyra.adapters.in.rest.dto.CustomerResponse;
+import ai.movyra.adapters.in.rest.dto.customer.CreateCustomerRequest;
+import ai.movyra.adapters.in.rest.dto.customer.CustomerResponse;
 import ai.movyra.adapters.in.rest.mapper.CustomerMapper;
 import ai.movyra.adapters.in.rest.tenant.TenantScoped;
 import ai.movyra.application.port.in.customer.CreateCustomerUseCase;

@@ -98,7 +98,6 @@ public class TenantRepositoryAdapter implements TenantRepository {
 
     @Override
     public List<Tenant> findActivePage(int offset, int limit, String sortField, boolean sortDesc) {
-        // whitelist de fields (evita JPQL injection via query param)
         String safeField = switch (sortField) {
             case "createdAt" -> "createdAt";
             case "name" -> "name";
@@ -118,5 +117,6 @@ public class TenantRepositoryAdapter implements TenantRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
 
 }

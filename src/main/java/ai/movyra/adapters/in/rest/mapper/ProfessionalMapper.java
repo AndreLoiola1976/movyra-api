@@ -1,7 +1,7 @@
 package ai.movyra.adapters.in.rest.mapper;
 
-import ai.movyra.adapters.in.rest.dto.ProfessionalResponse;
-import ai.movyra.adapters.in.rest.dto.CreateProfessionalRequest;
+import ai.movyra.adapters.in.rest.dto.professional.ProfessionalResponse;
+import ai.movyra.adapters.in.rest.dto.professional.CreateProfessionalRequest;
 import ai.movyra.application.port.in.professional.CreateProfessionalUseCase;
 import ai.movyra.domain.model.Professional;
 import ai.movyra.domain.model.valueobject.TenantId;

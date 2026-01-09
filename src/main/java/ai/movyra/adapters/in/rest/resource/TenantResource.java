@@ -1,8 +1,8 @@
 package ai.movyra.adapters.in.rest.resource;
 
-import ai.movyra.adapters.in.rest.dto.CreateTenantRequest;
-import ai.movyra.adapters.in.rest.dto.TenantResponse;
-import ai.movyra.adapters.in.rest.dto.UpdateTenantRequest;
+import ai.movyra.adapters.in.rest.dto.tenant.CreateTenantRequest;
+import ai.movyra.adapters.in.rest.dto.tenant.TenantResponse;
+import ai.movyra.adapters.in.rest.dto.tenant.UpdateTenantRequest;
 import ai.movyra.adapters.in.rest.mapper.TenantMapper;
 import ai.movyra.application.port.in.tenant.*;
 
@@ -58,17 +58,17 @@ public class TenantResource {
             @QueryParam("sort") @DefaultValue("createdAt") String sort,
             @QueryParam("desc") @DefaultValue("true") boolean desc
     ) {
-        long total = listTenantUseCase.countActiveTenants();
-
-        List<TenantResponse> items = listTenantUseCase.listActivePage(page, size, sort, desc)
-                .stream()
-                .map(TenantMapper::toResponse)
-                .toList();
-
         String safeSort = switch (sort) {
             case "createdAt", "name", "slug" -> sort;
             default -> "createdAt";
         };
+
+        long total = listTenantUseCase.countActiveTenants();
+
+        List<TenantResponse> items = listTenantUseCase.listActivePage(page, size, safeSort, desc)
+                .stream()
+                .map(TenantMapper::toResponse)
+                .toList();
 
         String sortExpr = safeSort + "," + (desc ? "desc" : "asc");
         return new PagedResponse<>(items, page, size, total, sortExpr);

@@ -1,8 +1,8 @@
 package ai.movyra.adapters.in.rest.resource;
 
 import ai.movyra.adapters.in.rest.context.TenantContext;
-import ai.movyra.adapters.in.rest.dto.CreateAppointmentRequest;
-import ai.movyra.adapters.in.rest.dto.AppointmentResponse;
+import ai.movyra.adapters.in.rest.dto.appointment.CreateAppointmentRequest;
+import ai.movyra.adapters.in.rest.dto.appointment.AppointmentResponse;
 import ai.movyra.adapters.in.rest.mapper.AppointmentMapper;
 import ai.movyra.adapters.in.rest.tenant.TenantScoped;
 import ai.movyra.application.port.in.appointment.CreateAppointmentUseCase;

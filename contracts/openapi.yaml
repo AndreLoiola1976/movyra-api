@@ -1,0 +1,1053 @@
+openapi: 3.1.0
+info:
+  title: Movyra API (Product Contract)
+  version: 0.2.0
+  description: >
+    Frontend-first contract aligned to DB schema (V1 + V3 + V4).
+    Multi-tenant via X-Tenant header for tenant-scoped routes.
+
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost:8080
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: MasterAdmin
+  - name: Tenants
+  - name: Customers
+  - name: Professionals
+  - name: Appointments
+  - name: ServiceCatalog
+  - name: TenantServices
+  - name: ServiceSuggestions
+  - name: Portfolio
+
+paths:
+
+  # =========================
+  # MASTER ADMIN (no X-Tenant)
+  # =========================
+
+  /api/tenants:
+    get:
+      tags: [Tenants]
+      summary: List tenants (master)
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+        - name: q
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paged list of tenants
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedTenant" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Tenants]
+      summary: Create tenant (master)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TenantCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/tenants/{tenantId}:
+    get:
+      tags: [Tenants]
+      summary: Get tenant by id (master)
+      parameters:
+        - $ref: "#/components/parameters/TenantIdPath"
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    patch:
+      tags: [Tenants]
+      summary: Update tenant (master)
+      parameters:
+        - $ref: "#/components/parameters/TenantIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TenantUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/tenants/{tenantId}/deactivate:
+    post:
+      tags: [Tenants]
+      summary: Deactivate tenant (soft delete)
+      parameters:
+        - $ref: "#/components/parameters/TenantIdPath"
+      responses:
+        "204":
+          description: Deactivated
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  # =========================
+  # TENANT-SCOPED (requires X-Tenant)
+  # =========================
+
+  /api/customers:
+    get:
+      tags: [Customers]
+      summary: List customers (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+        - name: q
+          in: query
+          required: false
+          schema: { type: string }
+          description: Free search (name/phone/email)
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedCustomer" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+    post:
+      tags: [Customers]
+      summary: Create customer (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/customers/{id}:
+    get:
+      tags: [Customers]
+      summary: Get customer by id (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    patch:
+      tags: [Customers]
+      summary: Update customer (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/professionals:
+    get:
+      tags: [Professionals]
+      summary: List professionals (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedProfessional" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Professionals]
+      summary: Create professional (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfessionalCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Professional" }
+        "409":
+          description: Conflict (e.g. userId already linked to another professional)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/professionals/{id}:
+    patch:
+      tags: [Professionals]
+      summary: Update professional (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfessionalUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Professional" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: Conflict (userId uniqueness)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/professionals/{id}/deactivate:
+    post:
+      tags: [ Professionals ]
+      summary: Deactivate professional (soft delete)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "204":
+          description: Deactivated
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/appointments:
+    get:
+      tags: [Appointments]
+      summary: List appointments (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+        - name: from
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/AppointmentStatus" }
+        - name: professionalId
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/Uuid" }
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedAppointment" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Appointments]
+      summary: Create appointment (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AppointmentCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Appointment" }
+        "409":
+          description: Conflict (e.g. overlap, invalid state transition)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/appointments/{id}:
+    patch:
+      tags: [Appointments]
+      summary: Update appointment (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AppointmentUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Appointment" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: Conflict (overlap / transition)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  # =========================
+  # GLOBAL SERVICE CATALOG (+i18n) + SUGGESTIONS
+  # =========================
+
+  /api/service-catalog:
+    get:
+      tags: [ServiceCatalog]
+      summary: List global service catalog
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+        - name: category
+          in: query
+          required: false
+          schema: { type: string }
+        - name: lang
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/Lang" }
+          description: If provided, returns localized name/description when available
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedServiceCatalogItem" }
+
+  /api/service-suggestions:
+    get:
+      tags: [ServiceSuggestions]
+      summary: List recommended services (global suggestions)
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - name: lang
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/Lang" }
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedServiceSuggestion" }
+
+  # =========================
+  # TENANT SERVICE ACTIVATION (PK = tenant_id + service_id)
+  # =========================
+
+  /api/tenant-services:
+    get:
+      tags: [TenantServices]
+      summary: List tenant services (activated/overridden)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+        - name: includeInactive
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedTenantService" }
+    post:
+      tags: [TenantServices]
+      summary: Activate a service for tenant (insert into tenant_services)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TenantServiceActivate" }
+      responses:
+        "201":
+          description: Activated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TenantService" }
+        "409":
+          description: Already activated (PK conflict)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/tenant-services/{id}:
+    patch:
+      tags: [ TenantServices ]
+      summary: Update tenant service override
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TenantServiceUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TenantService" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+
+  /api/tenant-services/{id}/deactivate:
+    post:
+      tags: [ TenantServices ]
+      summary: Deactivate tenant service (soft delete)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "204": { description: Deactivated }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+
+  # =========================
+  # PORTFOLIO (V4 shape)
+  # =========================
+
+  /api/portfolio-items:
+    get:
+      tags: [Portfolio]
+      summary: List portfolio items (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          description: Paged list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedPortfolioItem" }
+    post:
+      tags: [Portfolio]
+      summary: Create portfolio item (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortfolioItemCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortfolioItem" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/portfolio-items/{id}:
+    patch:
+      tags: [Portfolio]
+      summary: Update portfolio item (tenant)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortfolioItemUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortfolioItem" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/portfolio-items/{id}/deactivate:
+    post:
+      tags: [Portfolio]
+      summary: Deactivate portfolio item (soft delete)
+      parameters:
+        - $ref: "#/components/parameters/XTenant"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "204":
+          description: Deactivated
+        "404": { $ref: "#/components/responses/NotFound" }
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenant:
+      name: X-Tenant
+      in: header
+      required: true
+      schema: { $ref: "#/components/schemas/Uuid" }
+      description: Tenant id (UUID) for tenant-scoped routes.
+
+    TenantIdPath:
+      name: tenantId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/Uuid" }
+
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/Uuid" }
+
+    Page:
+      name: page
+      in: query
+      required: false
+      schema: { type: integer, minimum: 0, default: 0 }
+
+    Size:
+      name: size
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 200, default: 20 }
+
+    Sort:
+      name: sort
+      in: query
+      required: false
+      schema: { type: string, default: "createdAt,desc" }
+      description: Sort string like "createdAt,desc"
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ValidationError" }
+
+  schemas:
+
+    # ---- primitives
+    Uuid: { type: string, format: uuid }
+    IsoDateTime: { type: string, format: date-time }
+    Lang:
+      type: string
+      enum: [en, pt, es]
+
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        traceId: { type: string, nullable: true }
+
+    ValidationError:
+      type: object
+      required: [code, message, details]
+      properties:
+        code: { type: string, example: "VALIDATION_ERROR" }
+        message: { type: string, example: "Invalid request" }
+        details:
+          type: array
+          items:
+            type: object
+            required: [field, message]
+            properties:
+              field: { type: string }
+              message: { type: string }
+
+    PageMeta:
+      type: object
+      required: [page, size, totalItems, totalPages]
+      properties:
+        page: { type: integer, minimum: 0 }
+        size: { type: integer, minimum: 1 }
+        totalItems: { type: integer, minimum: 0 }
+        totalPages: { type: integer, minimum: 0 }
+
+    # ---- tenants (V1)
+    BillingStatus:
+      type: string
+      enum: [trial, active, past_due, cancelled]
+
+    TenantCreate:
+      type: object
+      required: [slug, name, timezone]
+      properties:
+        slug:
+          type: string
+          minLength: 3
+          maxLength: 80
+          description: Unique slug (DB unique)
+        name: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        addressLine1: { type: string, nullable: true }
+        addressLine2: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        state: { type: string, nullable: true }
+        zip: { type: string, nullable: true }
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          default: "US"
+        timezone:
+          type: string
+          default: "America/New_York"
+        logoUrl: { type: string, nullable: true }
+        billingEmail: { type: string, format: email, nullable: true }
+        billingName: { type: string, nullable: true }
+
+    TenantUpdate:
+      type: object
+      properties:
+        slug: { type: string, minLength: 3, maxLength: 80 }
+        name: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        addressLine1: { type: string, nullable: true }
+        addressLine2: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        state: { type: string, nullable: true }
+        zip: { type: string, nullable: true }
+        country: { type: string, minLength: 2, maxLength: 2 }
+        timezone: { type: string }
+        logoUrl: { type: string, nullable: true }
+        billingEmail: { type: string, format: email, nullable: true }
+        billingName: { type: string, nullable: true }
+        billingStatus: { $ref: "#/components/schemas/BillingStatus" }
+        isActive: { type: boolean }
+
+    Tenant:
+      type: object
+      required: [id, slug, name, country, timezone, billingStatus, isActive, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        slug: { type: string }
+        name: { type: string }
+        phone: { type: string, nullable: true }
+        addressLine1: { type: string, nullable: true }
+        addressLine2: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        state: { type: string, nullable: true }
+        zip: { type: string, nullable: true }
+        country: { type: string }
+        timezone: { type: string }
+        logoUrl: { type: string, nullable: true }
+        billingEmail: { type: string, nullable: true }
+        billingName: { type: string, nullable: true }
+        billingStatus: { $ref: "#/components/schemas/BillingStatus" }
+        isActive: { type: boolean }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+    PagedTenant:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Tenant" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- customers (V1 + V3 change: phone not unique)
+    CustomerCreate:
+      type: object
+      required: [fullName]
+      properties:
+        fullName: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        email: { type: string, format: email, nullable: true }
+        city: { type: string, nullable: true }
+
+    CustomerUpdate:
+      type: object
+      properties:
+        fullName: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        email: { type: string, format: email, nullable: true }
+        city: { type: string, nullable: true }
+
+    Customer:
+      type: object
+      required: [id, tenantId, fullName, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        tenantId: { $ref: "#/components/schemas/Uuid" }
+        fullName: { type: string }
+        phone: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        city: { type: string, nullable: true }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+    PagedCustomer:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Customer" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- professionals (V1 + V3 add user_id unique)
+    ProfessionalCreate:
+      type: object
+      required: [displayName]
+      properties:
+        displayName: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        photoUrl: { type: string, nullable: true }
+        userId:
+          $ref: "#/components/schemas/Uuid"
+          nullable: true
+          description: Optional link to app.users.id (must be unique globally)
+
+    ProfessionalUpdate:
+      type: object
+      properties:
+        displayName: { type: string, minLength: 2, maxLength: 200 }
+        phone: { type: string, nullable: true }
+        photoUrl: { type: string, nullable: true }
+        userId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        isActive: { type: boolean }
+
+    Professional:
+      type: object
+      required: [id, tenantId, displayName, isActive, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        tenantId: { $ref: "#/components/schemas/Uuid" }
+        displayName: { type: string }
+        phone: { type: string, nullable: true }
+        photoUrl: { type: string, nullable: true }
+        userId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        isActive: { type: boolean }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+    PagedProfessional:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Professional" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- appointments (V1)
+    AppointmentStatus:
+      type: string
+      enum: [requested, confirmed, cancelled, completed, no_show]
+
+    AppointmentCreate:
+      type: object
+      required: [tenantServiceId, startAt, endAt, status ]
+      properties:
+        customerId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        professionalId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        tenantServiceId: { $ref: "#/components/schemas/Uuid" }
+        startAt: { $ref: "#/components/schemas/IsoDateTime" }
+        endAt: { $ref: "#/components/schemas/IsoDateTime" }
+        status: { $ref: "#/components/schemas/AppointmentStatus" }
+        priceCents: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+        createdByUserId: { $ref: "#/components/schemas/Uuid", nullable: true }
+
+    AppointmentUpdate:
+      type: object
+      properties:
+        customerId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        professionalId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        tenantServiceId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        startAt: { $ref: "#/components/schemas/IsoDateTime" }
+        endAt: { $ref: "#/components/schemas/IsoDateTime" }
+        status: { $ref: "#/components/schemas/AppointmentStatus" }
+        priceCents: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+
+
+    Appointment:
+      type: object
+      required: [ id, tenantId, tenantServiceId, startAt, endAt, status, createdAt ]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        tenantId: { $ref: "#/components/schemas/Uuid" }
+        customerId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        professionalId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        tenantServiceId: { $ref: "#/components/schemas/Uuid" }
+        startAt: { $ref: "#/components/schemas/IsoDateTime" }
+        endAt: { $ref: "#/components/schemas/IsoDateTime" }
+        status: { $ref: "#/components/schemas/AppointmentStatus" }
+        priceCents: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+        createdByUserId: { $ref: "#/components/schemas/Uuid", nullable: true }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+        # optional DTO sugar for UI (not stored in DB)
+        serviceSnapshot:
+          type: object
+          nullable: true
+          properties:
+            code: { type: string }
+            name: { type: string }
+            durationMinutes: { type: integer }
+            priceCents: { type: integer }
+
+
+    PagedAppointment:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Appointment" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- service catalog (V1 + i18n)
+    ServiceCatalogItem:
+      type: object
+      required: [id, code, defaultDurationMinutes, defaultPriceCents, category, isActive, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        code: { type: string }
+        defaultDurationMinutes: { type: integer, minimum: 1 }
+        defaultPriceCents: { type: integer, minimum: 0 }
+        category: { type: string }
+        isActive: { type: boolean }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+        i18n:
+          type: object
+          nullable: true
+          properties:
+            lang: { $ref: "#/components/schemas/Lang" }
+            name: { type: string }
+            description: { type: string, nullable: true }
+
+    PagedServiceCatalogItem:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ServiceCatalogItem" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- service suggestions (V1)
+    ServiceSuggestion:
+      type: object
+      required: [serviceId, isRecommended, sortOrder, score, createdAt]
+      properties:
+        serviceId: { $ref: "#/components/schemas/Uuid" }
+        isRecommended: { type: boolean }
+        sortOrder: { type: integer }
+        score: { type: integer }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+        i18n:
+          type: object
+          nullable: true
+          properties:
+            lang: { $ref: "#/components/schemas/Lang" }
+            headline: { type: string }
+            reason: { type: string, nullable: true }
+
+    PagedServiceSuggestion:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ServiceSuggestion" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- tenant_services (V1 composite key)
+    TenantServiceActivate:
+      type: object
+      required: [ serviceId ]
+      properties:
+        serviceId: { $ref: "#/components/schemas/Uuid" }
+        priceCents: { type: integer, nullable: true }
+        durationMinutes: { type: integer, nullable: true }
+        isActive: { type: boolean, default: true }
+
+
+    TenantServiceUpdate:
+      type: object
+      properties:
+        priceCents: { type: integer, nullable: true }
+        durationMinutes: { type: integer, nullable: true }
+        isActive: { type: boolean }
+
+    TenantService:
+      type: object
+      required: [ id, tenantId, serviceId, isActive, createdAt ]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        tenantId: { $ref: "#/components/schemas/Uuid" }
+        serviceId: { $ref: "#/components/schemas/Uuid" }
+        priceCents: { type: integer, nullable: true }
+        durationMinutes: { type: integer, nullable: true }
+        isActive: { type: boolean }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+
+    PagedTenantService:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/TenantService" }
+        page: { $ref: "#/components/schemas/PageMeta" }
+
+    # ---- portfolio_items (V4 shape)
+    PortfolioItemCreate:
+      type: object
+      required: [ title, imageUrl ]
+      properties:
+        title: { type: string, minLength: 2, maxLength: 200 }
+        description: { type: string, nullable: true }
+        imageUrl: { type: string }
+        sortOrder: { type: integer, default: 100 }
+        isActive: { type: boolean, default: true }
+
+    PortfolioItemUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 200 }
+        description: { type: string, nullable: true }
+        imageUrl: { type: string }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+
+    PortfolioItem:
+      type: object
+      required: [ id, tenantId, title, imageUrl, sortOrder, isActive, createdAt ]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        tenantId: { $ref: "#/components/schemas/Uuid" }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        imageUrl: { type: string }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+        createdAt: { $ref: "#/components/schemas/IsoDateTime" }
+
+
+    PagedPortfolioItem:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/PortfolioItem" }
+        page: { $ref: "#/components/schemas/PageMeta" }
